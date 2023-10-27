@@ -6,7 +6,7 @@
 /*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 21:15:55 by ichiro            #+#    #+#             */
-/*   Updated: 2023/06/05 15:08:41 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/10/27 15:29:40 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
+# include <stdint.h>
 # include <fcntl.h>
 # include <stddef.h>
 # include <errno.h>
@@ -24,6 +25,7 @@
 # include <sys/wait.h>
 # include <pthread.h>
 # include <stdbool.h>
+# include <math.h>
 
 typedef struct s_philo
 {
@@ -39,6 +41,16 @@ typedef struct s_data
 	int				times_to_eat;
 	pthread_mutex_t	*forks;
 }	t_data;
+
+typedef struct s_seat
+{
+	bool	head;
+	t_philo	philo;
+	pthread_mutex_t	fork;
+
+	struct s_seat *left;
+	struct s_seat *right;
+}	t_seat;
 
 
 #endif
