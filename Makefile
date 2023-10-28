@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+         #
+#    By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/28 00:51:40 by ichiro            #+#    #+#              #
-#    Updated: 2023/10/27 15:30:40 by imisumi          ###   ########.fr        #
+#    Updated: 2023/10/29 00:06:58 by imisumi-wsl      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,6 +15,7 @@ NAME = philo
 HEADER = includes/philo.h
 
 CFLAGS = -g -I include
+CFLAGS += -lpthread -fsanitize=thread
 
 cc = gcc
 

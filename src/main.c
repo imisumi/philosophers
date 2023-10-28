@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/28 15:06:07 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/10/28 17:27:16 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,34 +168,42 @@ void	ft_usleep(int64_t time_to)
 		usleep(50);
 }
 
-void	change_philo_state(t_seat *seat, enum e_state state)
+bool	philo_is_alive(t_seat *seat)
 {
-	pthread_mutex_lock(&seat->philo.state_mutex);
-	seat->philo.state = state;
-	pthread_mutex_unlock(&seat->philo.state_mutex);
+	pthread_mutex_lock(&seat->data->m_state);
+	if (seat->data->dead == true)
+	{
+		pthread_mutex_unlock(&seat->data->m_state);
+		return (false);
+	}
+	pthread_mutex_unlock(&seat->data->m_state);
+	return (true);
 }
 
-void	take_fork(t_seat *seat)
+bool	meal_time(t_seat *seat)
 {
-	pthread_mutex_lock(&seat->philo.state_mutex);
-	seat->philo.state = EATING;
-	pthread_mutex_unlock(&seat->philo.state_mutex);
+	pthread_mutex_lock(&seat->next->fork);
+	if (philo_is_alive(seat) == false)
+	{
+		pthread_mutex_unlock(&seat->next->fork);
+		return (false);
+	}
+	printf("%ldms	%d Took a fork\n", current_time() - seat->data->start_time, seat->philo.id);
+	pthread_mutex_lock(&seat->fork);
+	if (philo_is_alive(seat) == false)
+	{
+		pthread_mutex_unlock(&seat->fork);
+		pthread_mutex_unlock(&seat->next->fork);
+		return (false);
+	}
+	printf("%ldms	%d Took a fork\n", current_time() - seat->data->start_time, seat->philo.id);
+
+	pthread_mutex_lock(&seat->philo.m_meal_time);
+	seat->philo.last_meal = current_time();
+	pthread_mutex_unlock(&seat->philo.m_meal_time);
+
 	
-	pthread_mutex_lock(&seat->next->fork);
-	printf("%ldms	%d Took a fork\n", current_time() - seat->data->start_time, seat->philo.id);
-	fflush(stdout);
-	pthread_mutex_lock(&seat->fork);
-	printf("%ldms	%d Took a fork\n", current_time() - seat->data->start_time, seat->philo.id);
-	fflush(stdout);
-}
-
-void	meal_time(t_seat *seat)
-{
-	pthread_mutex_lock(&seat->next->fork);
-	printf("%ldms	%d Took a fork\n", current_time() - seat->data->start_time, seat->philo.id);
-	pthread_mutex_lock(&seat->fork);
-	printf("%ldms	%d Took a fork\n", current_time() - seat->data->start_time, seat->philo.id);
-
+	
 	printf("%ldms	%d is eating\n", current_time() - seat->data->start_time, seat->philo.id);
 	// ft_usleep(seat->data->time_to_eat);
 	usleep(seat->data->time_to_eat * 1000);
@@ -209,7 +217,38 @@ void	meal_time(t_seat *seat)
 		seat->philo.meal_count--;
 		pthread_mutex_unlock(&seat->philo.m_meal_count);
 	}
+	return (true);
 }
+
+// bool	philo_is_alive(t_seat *seat)
+// {
+// 	pthread_mutex_lock(&seat->data->m_state);
+// 	if (seat->data->dead == true)
+// 	{
+// 		pthread_mutex_unlock(&seat->data->m_state);
+// 		return (false);
+// 	}
+// 	pthread_mutex_unlock(&seat->data->m_state);
+// 	return (true);
+// }
+
+bool	philo_can_continue(t_seat *seat)
+{
+	if (philo_is_alive(seat) == false)
+		return (false);
+	
+	pthread_mutex_lock(&seat->philo.m_meal_count);
+	if ((seat->philo.meal_count > 0 || seat->philo.meal_count == -1))
+	{
+		pthread_mutex_unlock(&seat->philo.m_meal_count);
+		return (true);
+	}
+	pthread_mutex_unlock(&seat->philo.m_meal_count);
+	// return (true);
+	return (false);
+}
+
+
 
 void	*routine(void *arg)
 {
@@ -218,99 +257,45 @@ void	*routine(void *arg)
 	seat = arg;
 	if (seat->philo.id % 2)
 		usleep(15000);
-	while(seat->philo.meal_count > 0 || seat->philo.meal_count == -1)
+	while(philo_can_continue(seat) == true)
 	{
-			take_fork(seat);
+		// printf("%ldms	%d ENTERING LOOP=====================\n", current_time() - seat->data->start_time, seat->philo.id);
+		if (meal_time(seat) == false)
+			return (NULL);
+		pthread_mutex_lock(&seat->philo.m_meal_count);
+		if (seat->philo.meal_count == 0)
+		{
+			pthread_mutex_unlock(&seat->philo.m_meal_count);
+			return (NULL);
+		}
+		pthread_mutex_unlock(&seat->philo.m_meal_count);
 
-			pthread_mutex_lock(&seat->philo.meal_mutex);
-			seat->philo.last_meal = current_time();
-			pthread_mutex_unlock(&seat->philo.meal_mutex);
+		// if (philo_is_alive(seat) == false)
+		// 	return (NULL);
 
-			
-			printf("%ldms	%d is eating\n", current_time() - seat->data->start_time, seat->philo.id);
-			usleep(seat->data->time_to_eat * 1000);
-			fflush(stdout);
-			
-			pthread_mutex_unlock(&seat->fork);
-			pthread_mutex_unlock(&seat->next->fork);
+		pthread_mutex_lock(&seat->data->m_state);
+		if (seat->data->dead == true)
+		{
+			pthread_mutex_unlock(&seat->data->m_state);
+			return (NULL);
+		}
+		printf("%ldms	%d is sleeping\n", current_time() - seat->data->start_time, seat->philo.id);
+		pthread_mutex_unlock(&seat->data->m_state);
+		usleep(seat->data->time_to_sleep * 1000);
+		// if (philo_is_alive(seat) == false)
+		// 	return (NULL);
 
-			if (seat->data->times_to_eat != -1)
-			{
-				pthread_mutex_lock(&seat->philo.m_meal_count);
-				seat->philo.meal_count--;
-				pthread_mutex_unlock(&seat->philo.m_meal_count);
-			}
-
-			// meal_time(seat);
-
-			// pthread_mutex_lock(&seat->philo.state_mutex);
-			// seat->philo.state = SLEEPING;
-			// pthread_mutex_unlock(&seat->philo.state_mutex);
-			// printf("---------------------------------------- %d\n", seat->philo.state);
-			change_philo_state(seat, SLEEPING);
-			// printf("---------------------------------------- %d\n", seat->philo.state);
-			printf("%ldms	%d is sleeping\n", current_time() - seat->data->start_time, seat->philo.id);
-			fflush(stdout);
-			usleep(seat->data->time_to_sleep * 1000);
-
-			seat->philo.state = THINKING;
+		pthread_mutex_lock(&seat->data->m_state);
+		if (seat->data->dead == true)
+		{
+			pthread_mutex_unlock(&seat->data->m_state);
+			return (NULL);
+		}
+		printf("%ldms	%d is thinking\n", current_time() - seat->data->start_time, seat->philo.id);
+		pthread_mutex_unlock(&seat->data->m_state);
 	}
-	// printf("done\n");
 }
 
-
-// void	*routine(void *arg)
-// {
-// 	t_seat	*seat;
-
-// 	seat = arg;
-// 	if (seat->philo.id % 2)
-// 		usleep(15000);
-// 	while(seat->philo.meal_count > 0 || seat->philo.meal_count == -1)
-// 	{
-// 		// if (seat->philo.last_meal > seat->next->philo.last_meal)
-// 		// 	continue;
-
-// 		// printf("philo: %d\n", seat->philo.id);
-// 		if (seat->prev->philo.state != EATING && seat->next->philo.state != EATING)
-// 		// if (seat->prev->philo.state != EATING)
-// 		{
-// 			take_fork(seat);
-
-// 			pthread_mutex_lock(&seat->philo.meal_mutex);
-// 			seat->philo.last_meal = current_time();
-// 			pthread_mutex_unlock(&seat->philo.meal_mutex);
-
-			
-// 			printf("%ldms	%d is eating\n", current_time() - seat->data->start_time, seat->philo.id);
-// 			usleep(seat->data->time_to_eat * 1000);
-// 			fflush(stdout);
-			
-// 			pthread_mutex_unlock(&seat->fork);
-// 			pthread_mutex_unlock(&seat->next->fork);
-
-// 			if (seat->data->times_to_eat != -1)
-// 			{
-// 				pthread_mutex_lock(&seat->philo.m_meal_count);
-// 				seat->philo.meal_count--;
-// 				pthread_mutex_unlock(&seat->philo.m_meal_count);
-// 			}
-
-// 			// pthread_mutex_lock(&seat->philo.state_mutex);
-// 			// seat->philo.state = SLEEPING;
-// 			// pthread_mutex_unlock(&seat->philo.state_mutex);
-// 			// printf("---------------------------------------- %d\n", seat->philo.state);
-// 			change_philo_state(seat, SLEEPING);
-// 			// printf("---------------------------------------- %d\n", seat->philo.state);
-// 			printf("%ldms	%d is sleeping\n", current_time() - seat->data->start_time, seat->philo.id);
-// 			fflush(stdout);
-// 			usleep(seat->data->time_to_sleep * 1000);
-
-// 			seat->philo.state = THINKING;
-// 		}
-// 	}
-// 	// printf("done\n");
-// }
 
 bool	create_philo(t_data *data)
 {
@@ -318,6 +303,8 @@ bool	create_philo(t_data *data)
 	t_seat	*new;
 
 	data->seats = NULL;
+	pthread_mutex_init(&data->m_state, NULL);
+	// pthread_mutex_init(&data->m_print, NULL);
 	i = 0;
 	// data->philo_count = 4;
 	// data->seats->philo.meal_count = -1;
@@ -336,10 +323,9 @@ bool	create_philo(t_data *data)
 	while (i < data->philo_count)
 	{
 		current->philo.meal_count = data->times_to_eat;
-		current->philo.state = THINKING;
 		//TODO: protect mutex
 		int p = pthread_mutex_init(&current->fork, NULL);
-		pthread_mutex_init(&current->philo.meal_mutex, NULL);
+		pthread_mutex_init(&current->philo.m_meal_time, NULL);
 		pthread_mutex_init(&current->philo.m_meal_count, NULL);
 		// printf("fork: %d\n", p);
 		current = current->next;
@@ -354,7 +340,7 @@ bool	create_philo(t_data *data)
 	{
 		// printf("philo thread\n");
 		current->philo.last_meal = current_time();
-		data->start_time = current_time();
+		// data->start_time = current_time();
 		pthread_create(&current->philo.thread, NULL, &routine, current);
 		current = current->next;
 		i++;
@@ -364,17 +350,31 @@ bool	create_philo(t_data *data)
 	current = data->seats;
 	while (current)
 	{
-		pthread_mutex_lock(&current->philo.meal_mutex);
+		pthread_mutex_lock(&current->philo.m_meal_time);
 		int64_t last = current->philo.last_meal;
-		pthread_mutex_unlock(&current->philo.meal_mutex);
-		pthread_mutex_unlock(&current->philo.state_mutex);
+		pthread_mutex_unlock(&current->philo.m_meal_time);
+
+		pthread_mutex_lock(&current->philo.m_meal_count);
+		if (current->philo.meal_count == 0)
+		{
+			pthread_mutex_unlock(&current->philo.m_meal_count);
+			break ;
+		}
+		pthread_mutex_unlock(&current->philo.m_meal_count);
+
 		if (current_time() - last > data->time_to_die)
 		{
-			pthread_mutex_lock(&data->seats->philo.state_mutex);
-			data->seats->philo.state = DEAD;
-			pthread_mutex_unlock(&data->seats->philo.state_mutex);
-			printf("%d died\n", current->philo.id);
-			exit(0);
+			pthread_mutex_lock(&data->m_state);
+			data->dead = true;
+			printf("%ldms	\x1b[1;31m%d died\x1b[0m\n", current_time() - current->data->start_time, current->philo.id);
+			pthread_mutex_unlock(&data->m_state);
+			// printf("%d died\n", current->philo.id);
+			
+			// printf("%ldms	\x1b[1;31m%d died\x1b[0m\n", current_time() - current->data->start_time, current->philo.id);
+
+
+			// exit(0);
+			break ;
 		}
 		
 		current = current->next;
