@@ -6,40 +6,43 @@
 #    By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/28 00:51:40 by ichiro            #+#    #+#              #
-#    Updated: 2023/10/29 00:06:58 by imisumi-wsl      ###   ########.fr        #
+#    Updated: 2023/10/29 03:01:10 by imisumi-wsl      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = philo
 
-HEADER = includes/philo.h
-
-CFLAGS = -g -I include
-CFLAGS += -lpthread -fsanitize=thread
+CFLAGS = -g -Wall -Wextra -Werror -pthread
+# CFLAGS += -lpthread -fsanitize=thread
 
 cc = gcc
 
-OBJS_DIR = objs
+OBJS_DIR = .objs
 SRC_DIR = src
 
-INC := -I $(INCLUDE_DIR)
+BLUE := \033[1;34m
+PINK := \033[1;38;5;206m
+NC := \033[0m
 
-SRCS =  main.c
+SRCS =	main.c \
+		input.c \
+		thread.c \
+		setup.c \
+		seat.c \
+		utils.c 
 
 OBJS = $(addprefix $(OBJS_DIR)/,$(SRCS:.c=.o))
 
 all: $(NAME)
+	@echo "$(PINK)done$(NC)"
 
 $(OBJS_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(dir $@)
-	@$(cc) $(CFLAGS) $(INC) -I -c -o $@ $<
+	@echo "$(BLUE)compiling: $<$(NC)"
+	@$(cc) $(CFLAGS) -c $< -o $@
 
-
-$(NAME): $(LIBFT) $(OBJS)
-	@$(cc) $(CFLAGS) $(INC) -I $^ -o $(NAME)
-
-run: all
-	./$(NAME)
+$(NAME): $(OBJS)
+	@$(cc) $(CFLAGS) $^ -o $(NAME)
 
 clean:
 	@rm -rf $(OBJS_DIR)
@@ -50,4 +53,4 @@ fclean:
 
 re: fclean all
 
-.PHONY: all clean fclean re run
+.PHONY: all clean fclean re
