@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/29 02:51:07 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/05 18:23:05 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void	ft_usleep(t_seat *seat, int64_t time_to)
 	{
 		if (philo_is_alive(seat) == false)
 			return ;
-		usleep(100);
+		usleep(256);
 	}
 }
 

@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/29 02:50:16 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/05 21:21:26 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,7 @@ static void	monitoring(t_data *data)
 			break ;
 		}
 		current = current->next;
+		usleep(1);
 	}
 }
 
@@ -91,6 +92,5 @@ int	main(int argc, char *argv[])
 	create_threads(&data);
 	monitoring(&data);
 	finalize(&data);
-	pthread_mutex_destroy(&data.m_state);
 	return (EXIT_SUCCESS);
 }

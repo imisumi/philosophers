@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/29 02:56:56 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/06 00:19:59 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,29 +22,47 @@ static void	update_times_ate(t_seat *seat)
 	}
 }
 
-static bool	meal_time(t_seat *seat)
+bool	pickup_fork(t_seat *seat, pthread_mutex_t *first, pthread_mutex_t *second)
 {
-	pthread_mutex_lock(&seat->fork);
-	if (philo_is_alive(seat) == false)
-		return (pthread_mutex_unlock(&seat->fork), false);
+	pthread_mutex_lock(first);
 	print_state(seat, FORK);
-	if (seat->data->philo_count == 1)
-		return (pthread_mutex_unlock(&seat->fork), false);
-	pthread_mutex_lock(&seat->next->fork);
 	if (philo_is_alive(seat) == false)
 	{
-		pthread_mutex_unlock(&seat->next->fork);
-		pthread_mutex_unlock(&seat->fork);
+		pthread_mutex_unlock(first);
 		return (false);
 	}
+	if (seat->data->philo_count == 1)
+	{
+		pthread_mutex_unlock(first);
+		return (false);
+	}
+	pthread_mutex_lock(second);
 	print_state(seat, FORK);
+	if (philo_is_alive(seat) == false)
+	{
+		pthread_mutex_unlock(second);
+		pthread_mutex_unlock(first);
+		return (false);
+	}
+	return (true);
+}
+
+void	putdown_fork(pthread_mutex_t *fork)
+{
+	pthread_mutex_unlock(fork);
+}
+
+static bool	meal_time(t_seat *seat)
+{
+	if (pickup_fork(seat, &seat->fork, &seat->next->fork) == false)
+		return (false);
 	pthread_mutex_lock(&seat->philo.m_meal_time);
 	seat->philo.last_meal = current_time();
 	pthread_mutex_unlock(&seat->philo.m_meal_time);
 	print_state(seat, EATING);
 	ft_usleep(seat, seat->data->time_to_eat);
-	pthread_mutex_unlock(&seat->next->fork);
-	pthread_mutex_unlock(&seat->fork);
+	putdown_fork(&seat->next->fork);
+	putdown_fork(&seat->fork);
 	update_times_ate(seat);
 	return (true);
 }
@@ -68,8 +86,6 @@ static void	*routine(void *arg)
 	t_seat	*seat;
 
 	seat = arg;
-	if (seat->philo.id % 2 && seat->data->philo_count != 1)
-		usleep(256);
 	while (philo_can_continue(seat) == true)
 	{
 		if (meal_time(seat) == false)
