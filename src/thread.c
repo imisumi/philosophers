@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   thread.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
+/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/06 00:19:59 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/07 17:22:47 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,8 +54,17 @@ void	putdown_fork(pthread_mutex_t *fork)
 
 static bool	meal_time(t_seat *seat)
 {
-	if (pickup_fork(seat, &seat->fork, &seat->next->fork) == false)
-		return (false);
+	if (seat->philo.id % 2)
+	{
+		ft_usleep(seat, 1);
+		if (pickup_fork(seat, &seat->next->fork, &seat->fork) == false)
+			return (false);
+	}
+	else
+	{
+		if (pickup_fork(seat, &seat->fork, &seat->next->fork) == false)
+			return (false);
+	}
 	pthread_mutex_lock(&seat->philo.m_meal_time);
 	seat->philo.last_meal = current_time();
 	pthread_mutex_unlock(&seat->philo.m_meal_time);
@@ -101,7 +110,7 @@ static void	*routine(void *arg)
 	return (NULL);
 }
 
-void	create_threads(t_data *data)
+bool	create_threads(t_data *data)
 {
 	int		i;
 	t_seat	*current;
@@ -114,8 +123,16 @@ void	create_threads(t_data *data)
 		pthread_mutex_lock(&current->philo.m_meal_time);
 		current->philo.last_meal = data->start_time;
 		pthread_mutex_unlock(&current->philo.m_meal_time);
-		pthread_create(&current->philo.thread, NULL, &routine, current);
+		if (pthread_create(&current->philo.thread, NULL, &routine, current) != 0)
+		{
+			pthread_mutex_lock(&data->m_state);
+			data->dead = true;
+			pthread_mutex_unlock(&data->m_state);
+			finalize(data, i - 1);
+			return (false);
+		}
 		current = current->next;
 		i++;
 	}
+	return (true);
 }

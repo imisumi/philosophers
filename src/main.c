@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
+/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/05 21:21:26 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/07 17:23:55 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,14 +34,14 @@ static void	free_seats(t_seat *head)
 	head = NULL;
 }
 
-static void	finalize(t_data *data)
+void	finalize(t_data *data, int index)
 {
 	int		i;
 	t_seat	*current;
 
 	i = 0;
 	current = data->seats;
-	while (i < data->philo_count)
+	while (i < index)
 	{
 		pthread_join(current->philo.thread, NULL);
 		current = current->next;
@@ -70,7 +70,7 @@ static void	monitoring(t_data *data)
 		{
 			pthread_mutex_lock(&data->m_state);
 			data->dead = true;
-			printf("%ldms	%s%d died%s\n", current_time() - \
+			printf("%ld	%s%d died%s\n", current_time() - \
 				current->data->start_time, RED, current->philo.id, RESET);
 			pthread_mutex_unlock(&data->m_state);
 			break ;
@@ -89,8 +89,9 @@ int	main(int argc, char *argv[])
 		return (EXIT_FAILURE);
 	if (setup_table(&data) == false)
 		return (EXIT_FAILURE);
-	create_threads(&data);
+	if (create_threads(&data) == false)
+		return (EXIT_FAILURE);
 	monitoring(&data);
-	finalize(&data);
+	finalize(&data, data.philo_count);
 	return (EXIT_SUCCESS);
 }

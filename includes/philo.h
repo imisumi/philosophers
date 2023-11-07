@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
+/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 21:15:55 by ichiro            #+#    #+#             */
-/*   Updated: 2023/10/29 02:48:47 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/07 17:23:38 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ void	insert_seat(t_seat **head, t_seat *new);
 bool	setup_table(t_data *data);
 
 // THREAD.C
-void	create_threads(t_data *data);
+bool	create_threads(t_data *data);
 
 // UTILS.C
 size_t	ft_strlen(char *str);
@@ -102,5 +102,8 @@ int64_t	current_time(void);
 void	ft_usleep(t_seat *seat, int64_t time_to);
 void	print_state(t_seat *seat, enum e_action action);
 bool	philo_is_alive(t_seat *seat);
+
+// MAIN.C
+void	finalize(t_data *data, int index);
 
 #endif
