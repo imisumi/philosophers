@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   setup.c                                            :+:      :+:    :+:   */
+/*   input.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
+/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/29 02:24:02 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/09 13:18:55 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,12 +65,12 @@ bool	valid_input(int argc, char *argv[], t_data *data)
 	{
 		data->times_to_eat = ft_atoi(argv[5]);
 		if (data->times_to_eat < 1)
-			return (false);
+			return (error_msg("Positive numbers only\n"), false);
 	}
 	else
 		data->times_to_eat = -1;
 	if (data->philo_count < 1 || data->time_to_die < 1 || data->time_to_eat < 1
 		|| data->time_to_sleep < 1)
-		return (false);
+		return (error_msg("Positive numbers only\n"), false);
 	return (true);
 }

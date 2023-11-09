@@ -6,7 +6,7 @@
 /*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/07 17:23:55 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/11/09 13:47:58 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,20 @@ void	finalize(t_data *data, int index)
 	pthread_mutex_destroy(&data->m_state);
 }
 
+bool	philo_can_continue(t_seat *seat)
+{
+	if (philo_is_alive(seat) == false)
+		return (false);
+	pthread_mutex_lock(&seat->philo.m_meal_count);
+	if ((seat->philo.meal_count > 0 || seat->philo.meal_count == -1))
+	{
+		pthread_mutex_unlock(&seat->philo.m_meal_count);
+		return (true);
+	}
+	pthread_mutex_unlock(&seat->philo.m_meal_count);
+	return (false);
+}
+
 static void	monitoring(t_data *data)
 {
 	int64_t	last;
@@ -76,7 +90,7 @@ static void	monitoring(t_data *data)
 			break ;
 		}
 		current = current->next;
-		usleep(1);
+		usleep(64);
 	}
 }
 

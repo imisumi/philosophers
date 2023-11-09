@@ -6,7 +6,7 @@
 /*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/07 17:22:47 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/11/09 15:08:27 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,34 +22,29 @@ static void	update_times_ate(t_seat *seat)
 	}
 }
 
-bool	pickup_fork(t_seat *seat, pthread_mutex_t *first, pthread_mutex_t *second)
+bool	pickup_fork(t_seat *seat, pthread_mutex_t *m1, pthread_mutex_t *m2)
 {
-	pthread_mutex_lock(first);
+	pthread_mutex_lock(m1);
 	print_state(seat, FORK);
 	if (philo_is_alive(seat) == false)
 	{
-		pthread_mutex_unlock(first);
+		pthread_mutex_unlock(m1);
 		return (false);
 	}
 	if (seat->data->philo_count == 1)
 	{
-		pthread_mutex_unlock(first);
+		pthread_mutex_unlock(m1);
 		return (false);
 	}
-	pthread_mutex_lock(second);
+	pthread_mutex_lock(m2);
 	print_state(seat, FORK);
 	if (philo_is_alive(seat) == false)
 	{
-		pthread_mutex_unlock(second);
-		pthread_mutex_unlock(first);
+		pthread_mutex_unlock(m2);
+		pthread_mutex_unlock(m1);
 		return (false);
 	}
 	return (true);
-}
-
-void	putdown_fork(pthread_mutex_t *fork)
-{
-	pthread_mutex_unlock(fork);
 }
 
 static bool	meal_time(t_seat *seat)
@@ -70,24 +65,10 @@ static bool	meal_time(t_seat *seat)
 	pthread_mutex_unlock(&seat->philo.m_meal_time);
 	print_state(seat, EATING);
 	ft_usleep(seat, seat->data->time_to_eat);
-	putdown_fork(&seat->next->fork);
-	putdown_fork(&seat->fork);
+	pthread_mutex_unlock(&seat->next->fork);
+	pthread_mutex_unlock(&seat->fork);
 	update_times_ate(seat);
 	return (true);
-}
-
-static bool	philo_can_continue(t_seat *seat)
-{
-	if (philo_is_alive(seat) == false)
-		return (false);
-	pthread_mutex_lock(&seat->philo.m_meal_count);
-	if ((seat->philo.meal_count > 0 || seat->philo.meal_count == -1))
-	{
-		pthread_mutex_unlock(&seat->philo.m_meal_count);
-		return (true);
-	}
-	pthread_mutex_unlock(&seat->philo.m_meal_count);
-	return (false);
 }
 
 static void	*routine(void *arg)
@@ -95,6 +76,8 @@ static void	*routine(void *arg)
 	t_seat	*seat;
 
 	seat = arg;
+	pthread_mutex_lock(&seat->data->m_state);
+	pthread_mutex_unlock(&seat->data->m_state);
 	while (philo_can_continue(seat) == true)
 	{
 		if (meal_time(seat) == false)
@@ -117,22 +100,23 @@ bool	create_threads(t_data *data)
 
 	i = 0;
 	current = data->seats;
+	pthread_mutex_lock(&data->m_state);
 	data->start_time = current_time();
 	while (i < data->philo_count)
 	{
 		pthread_mutex_lock(&current->philo.m_meal_time);
 		current->philo.last_meal = data->start_time;
 		pthread_mutex_unlock(&current->philo.m_meal_time);
-		if (pthread_create(&current->philo.thread, NULL, &routine, current) != 0)
+		if (pthread_create(&current->philo.thread, NULL, \
+				&routine, current) != 0)
 		{
-			pthread_mutex_lock(&data->m_state);
 			data->dead = true;
 			pthread_mutex_unlock(&data->m_state);
-			finalize(data, i - 1);
+			finalize(data, i);
 			return (false);
 		}
 		current = current->next;
 		i++;
 	}
-	return (true);
+	return (pthread_mutex_unlock(&data->m_state), true);
 }

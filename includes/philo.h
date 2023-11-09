@@ -6,7 +6,7 @@
 /*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 21:15:55 by ichiro            #+#    #+#             */
-/*   Updated: 2023/11/07 17:23:38 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/11/09 13:56:58 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,7 @@ typedef struct s_data
 bool	valid_input(int argc, char *argv[], t_data *data);
 
 // SEAT.c
+void	free_seat_fail(t_seat *head);
 t_seat	*create_seat_node(t_data *data);
 void	insert_seat(t_seat **head, t_seat *new);
 
@@ -105,5 +106,6 @@ bool	philo_is_alive(t_seat *seat);
 
 // MAIN.C
 void	finalize(t_data *data, int index);
+bool	philo_can_continue(t_seat *seat);
 
 #endif

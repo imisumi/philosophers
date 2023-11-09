@@ -6,7 +6,7 @@
 /*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/07 16:33:36 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/11/09 13:48:53 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,6 @@ void	print_state(t_seat *seat, enum e_action action)
 	}
 	pthread_mutex_unlock(&seat->data->m_state);
 }
-
 
 bool	philo_is_alive(t_seat *seat)
 {
