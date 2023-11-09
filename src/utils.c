@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/09 13:48:53 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/11/09 18:45:26 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,11 +44,11 @@ void	ft_usleep(t_seat *seat, int64_t time_to)
 	}
 }
 
-void	print_state(t_seat *seat, enum e_action action)
+bool	print_state(t_seat *seat, enum e_action action)
 {
 	pthread_mutex_lock(&seat->data->m_state);
 	if (seat->data->dead == true)
-		return ((void)pthread_mutex_unlock(&seat->data->m_state));
+		return ((void)pthread_mutex_unlock(&seat->data->m_state), false);
 	if (action == FORK)
 	{
 		printf("%ld	%s%d has taken a fork%s\n", current_time() - \
@@ -70,6 +70,7 @@ void	print_state(t_seat *seat, enum e_action action)
 			seat->data->start_time, MAGENTA, seat->philo.id, RESET);
 	}
 	pthread_mutex_unlock(&seat->data->m_state);
+	return (true);
 }
 
 bool	philo_is_alive(t_seat *seat)

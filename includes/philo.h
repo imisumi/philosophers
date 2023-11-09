@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 21:15:55 by ichiro            #+#    #+#             */
-/*   Updated: 2023/11/09 13:56:58 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/11/09 19:02:11 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,12 +29,19 @@
 # include <stdbool.h>
 # include <math.h>
 
-# define RED "\x1b[1;31m"
-# define BLUE "\x1b[1;34m"
-# define GREEN "\x1b[1;32m"
-# define YELLOW "\x1b[1;33m"
-# define MAGENTA "\x1b[1;35m"
-# define RESET "\x1b[0m"
+// # define RED "\x1b[1;31m"
+// # define BLUE "\x1b[1;34m"
+// # define GREEN "\x1b[1;32m"
+// # define YELLOW "\x1b[1;33m"
+// # define MAGENTA "\x1b[1;35m"
+// # define RESET "\x1b[0m"
+
+# define RED ""
+# define BLUE ""
+# define GREEN ""
+# define YELLOW ""
+# define MAGENTA ""
+# define RESET ""
 
 enum e_action
 {
@@ -49,7 +56,6 @@ typedef struct s_philo
 	int				id;
 
 	int				meal_count;
-	pthread_mutex_t	m_meal_count;
 
 	int64_t			last_meal;
 	pthread_mutex_t	m_meal_time;
@@ -101,7 +107,7 @@ bool	create_threads(t_data *data);
 size_t	ft_strlen(char *str);
 int64_t	current_time(void);
 void	ft_usleep(t_seat *seat, int64_t time_to);
-void	print_state(t_seat *seat, enum e_action action);
+bool	print_state(t_seat *seat, enum e_action action);
 bool	philo_is_alive(t_seat *seat);
 
 // MAIN.C
