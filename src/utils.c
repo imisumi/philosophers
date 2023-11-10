@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
+/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/09 18:45:26 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/10 15:08:27 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,15 +40,15 @@ void	ft_usleep(t_seat *seat, int64_t time_to)
 	{
 		if (philo_is_alive(seat) == false)
 			return ;
-		usleep(256);
+		usleep(300);
 	}
 }
 
 bool	print_state(t_seat *seat, enum e_action action)
 {
-	pthread_mutex_lock(&seat->data->m_state);
-	if (seat->data->dead == true)
-		return ((void)pthread_mutex_unlock(&seat->data->m_state), false);
+	if (philo_is_alive(seat) == false)
+		return (false);
+	pthread_mutex_lock(&seat->data->m_print);
 	if (action == FORK)
 	{
 		printf("%ld	%s%d has taken a fork%s\n", current_time() - \
@@ -69,18 +69,18 @@ bool	print_state(t_seat *seat, enum e_action action)
 		printf("%ld	%s%d is thinking%s\n", current_time() - \
 			seat->data->start_time, MAGENTA, seat->philo.id, RESET);
 	}
-	pthread_mutex_unlock(&seat->data->m_state);
+	pthread_mutex_unlock(&seat->data->m_print);
 	return (true);
 }
 
 bool	philo_is_alive(t_seat *seat)
 {
+	bool	dead;
+
 	pthread_mutex_lock(&seat->data->m_state);
-	if (seat->data->dead == true)
-	{
-		pthread_mutex_unlock(&seat->data->m_state);
-		return (false);
-	}
+	dead = seat->data->dead;
 	pthread_mutex_unlock(&seat->data->m_state);
+	if (dead == true)
+		return (false);
 	return (true);
 }

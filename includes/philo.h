@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
+/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 21:15:55 by ichiro            #+#    #+#             */
-/*   Updated: 2023/11/09 19:02:11 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/10 14:56:59 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ typedef struct s_philo
 	int				meal_count;
 
 	int64_t			last_meal;
-	pthread_mutex_t	m_meal_time;
+	pthread_mutex_t	m_meal;
 
 	pthread_t		thread;
 }	t_philo;
@@ -87,6 +87,7 @@ typedef struct s_data
 	t_seat			*seats;
 	bool			dead;
 	pthread_mutex_t	m_state;
+	pthread_mutex_t	m_print;
 }	t_data;
 
 // INPUT.C

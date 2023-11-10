@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
+/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/09 19:02:08 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/10 14:59:31 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,13 @@ static void	free_seats(t_seat *head)
 	while (current != NULL && current->next != head)
 	{
 		pthread_mutex_destroy(&current->fork);
-		pthread_mutex_destroy(&current->philo.m_meal_time);
+		pthread_mutex_destroy(&current->philo.m_meal);
 		temp = current;
 		current = current->next;
 		free(temp);
 	}
 	pthread_mutex_destroy(&current->fork);
-	pthread_mutex_destroy(&current->philo.m_meal_time);
+	pthread_mutex_destroy(&current->philo.m_meal);
 	free(current);
 	head = NULL;
 }
@@ -53,13 +53,13 @@ bool	philo_can_continue(t_seat *seat)
 {
 	if (philo_is_alive(seat) == false)
 		return (false);
-	pthread_mutex_lock(&seat->philo.m_meal_time);
+	pthread_mutex_lock(&seat->philo.m_meal);
 	if ((seat->philo.meal_count > 0 || seat->philo.meal_count == -1))
 	{
-		pthread_mutex_unlock(&seat->philo.m_meal_time);
+		pthread_mutex_unlock(&seat->philo.m_meal);
 		return (true);
 	}
-	pthread_mutex_unlock(&seat->philo.m_meal_time);
+	pthread_mutex_unlock(&seat->philo.m_meal);
 	return (false);
 }
 
@@ -71,18 +71,20 @@ static void	monitoring(t_data *data)
 	current = data->seats;
 	while (current)
 	{
-		pthread_mutex_lock(&current->philo.m_meal_time);
+		pthread_mutex_lock(&current->philo.m_meal);
 		last = current->philo.last_meal;
 		if (current->philo.meal_count == 0)
-			return ((void)pthread_mutex_unlock(&current->philo.m_meal_time));
-		pthread_mutex_unlock(&current->philo.m_meal_time);
+			return ((void)pthread_mutex_unlock(&current->philo.m_meal));
+		pthread_mutex_unlock(&current->philo.m_meal);
 		if (current_time() - last >= data->time_to_die)
 		{
 			pthread_mutex_lock(&data->m_state);
 			data->dead = true;
+			pthread_mutex_unlock(&data->m_state);
+			pthread_mutex_lock(&data->m_print);
 			printf("%ld	%s%d died%s\n", current_time() - \
 				current->data->start_time, RED, current->philo.id, RESET);
-			pthread_mutex_unlock(&data->m_state);
+			pthread_mutex_unlock(&data->m_print);
 			break ;
 		}
 		current = current->next;
