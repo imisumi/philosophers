@@ -6,17 +6,11 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/10 20:25:34 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/10 22:32:45 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philo.h"
-
-// void	mutex_set(pthread_mutex_t *mutex, int64_t i)
-// {
-// 	pthread_mutex_lock(mutex);
-// 	pthread_mutex_unlock(mutex);
-// }
 
 size_t	ft_strlen(char *str)
 {
@@ -50,7 +44,6 @@ bool	ft_usleep(t_seat *seat, int64_t time_to)
 	}
 	return (true);
 }
-
 
 bool	print_state(t_seat *seat, enum e_action action)
 {
