@@ -3,14 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/10 15:08:27 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/11/10 20:25:34 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philo.h"
+
+// void	mutex_set(pthread_mutex_t *mutex, int64_t i)
+// {
+// 	pthread_mutex_lock(mutex);
+// 	pthread_mutex_unlock(mutex);
+// }
 
 size_t	ft_strlen(char *str)
 {
@@ -31,56 +37,39 @@ int64_t	current_time(void)
 	return ((tv.tv_sec) * 1000 + (tv.tv_usec) / 1000);
 }
 
-void	ft_usleep(t_seat *seat, int64_t time_to)
+bool	ft_usleep(t_seat *seat, int64_t time_to)
 {
 	int64_t	start;
 
 	start = current_time();
 	while (current_time() - start < time_to)
 	{
-		if (philo_is_alive(seat) == false)
-			return ;
+		if (is_philo_dead(seat) == true)
+			return (false);
 		usleep(300);
 	}
+	return (true);
 }
+
 
 bool	print_state(t_seat *seat, enum e_action action)
 {
-	if (philo_is_alive(seat) == false)
+	const char	*table[] = {"has taken a fork", "is eating", "is sleeping", "is thinking"};
+
+	if (is_philo_dead(seat) == true)
 		return (false);
 	pthread_mutex_lock(&seat->data->m_print);
-	if (action == FORK)
-	{
-		printf("%ld	%s%d has taken a fork%s\n", current_time() - \
-			seat->data->start_time, GREEN, seat->philo.id, RESET);
-	}
-	else if (action == EATING)
-	{
-		printf("%ld	%s%d is eating%s\n", current_time() - \
-			seat->data->start_time, YELLOW, seat->philo.id, RESET);
-	}
-	else if (action == SLEEPING)
-	{
-		printf("%ld	%s%d is sleeping%s\n", current_time() - \
-			seat->data->start_time, BLUE, seat->philo.id, RESET);
-	}
-	else if (action == THINKING)
-	{
-		printf("%ld	%s%d is thinking%s\n", current_time() - \
-			seat->data->start_time, MAGENTA, seat->philo.id, RESET);
-	}
+	printf("%ld	%d %s\n", current_time() - seat->data->start_time, seat->philo.id, table[action]);
 	pthread_mutex_unlock(&seat->data->m_print);
 	return (true);
 }
 
-bool	philo_is_alive(t_seat *seat)
+bool	is_philo_dead(t_seat *seat)
 {
 	bool	dead;
 
 	pthread_mutex_lock(&seat->data->m_state);
 	dead = seat->data->dead;
 	pthread_mutex_unlock(&seat->data->m_state);
-	if (dead == true)
-		return (false);
-	return (true);
+	return (dead);
 }

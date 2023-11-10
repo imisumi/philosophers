@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 21:15:55 by ichiro            #+#    #+#             */
-/*   Updated: 2023/11/10 14:56:59 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/11/10 22:15:44 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,14 @@ enum e_action
 	THINKING
 };
 
+typedef struct s_mutex_fork
+{
+	pthread_mutex_t	m_fork;
+	bool			locked;
+	pthread_mutex_t	m_lock;
+}	t_mutex_fork;
+
+
 typedef struct s_philo
 {
 	int				id;
@@ -63,6 +71,8 @@ typedef struct s_philo
 	pthread_t		thread;
 }	t_philo;
 
+
+
 typedef struct s_seat
 {
 	bool			head;
@@ -70,6 +80,7 @@ typedef struct s_seat
 	t_philo			philo;
 
 	pthread_mutex_t	fork;
+	t_mutex_fork	f;
 
 	struct s_data	*data;
 	struct s_seat	*next;
@@ -107,9 +118,9 @@ bool	create_threads(t_data *data);
 // UTILS.C
 size_t	ft_strlen(char *str);
 int64_t	current_time(void);
-void	ft_usleep(t_seat *seat, int64_t time_to);
+bool	ft_usleep(t_seat *seat, int64_t time_to);
 bool	print_state(t_seat *seat, enum e_action action);
-bool	philo_is_alive(t_seat *seat);
+bool	is_philo_dead(t_seat *seat);
 
 // MAIN.C
 void	finalize(t_data *data, int index);

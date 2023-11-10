@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   setup.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/10 14:57:33 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/11/10 21:43:36 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,8 +62,13 @@ static bool	init_mutexes(t_data *data)
 		if (pthread_mutex_init(&current->fork, NULL) != 0)
 			return (destroy_mutexes(data, i));
 		if (pthread_mutex_init(&current->philo.m_meal, NULL) != 0)
-			return (pthread_mutex_destroy(&current->fork), \
-						destroy_mutexes(data, i));
+			return (pthread_mutex_destroy(&current->fork), destroy_mutexes(data, i));
+
+
+		pthread_mutex_init(&current->f.m_fork, NULL);
+		pthread_mutex_init(&current->f.m_lock, NULL);
+
+						
 		current = current->next;
 		i++;
 	}

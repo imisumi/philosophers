@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/10 14:59:31 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/11/10 21:22:43 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ void	finalize(t_data *data, int index)
 
 bool	philo_can_continue(t_seat *seat)
 {
-	if (philo_is_alive(seat) == false)
+	if (is_philo_dead(seat) == true)
 		return (false);
 	pthread_mutex_lock(&seat->philo.m_meal);
 	if ((seat->philo.meal_count > 0 || seat->philo.meal_count == -1))
