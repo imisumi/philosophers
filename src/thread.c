@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/10 22:24:47 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/11 00:35:22 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ static bool	meal_time(t_seat *seat)
 {
 	if (seat->philo.id % 2)
 	{
-		// ft_usleep(seat, 1);
+		ft_usleep(seat, 1);
 		if (pickup_fork(seat, &seat->next->fork, &seat->fork) == false)
 			return (false);
 	}
@@ -57,6 +57,17 @@ static bool	meal_time(t_seat *seat)
 	ft_usleep(seat, seat->data->time_to_eat);
 	pthread_mutex_unlock(&seat->next->fork);
 	pthread_mutex_unlock(&seat->fork);
+
+	// if (seat->philo.id % 2)
+	// {
+	// 	pthread_mutex_unlock(&seat->next->fork);
+	// 	pthread_mutex_unlock(&seat->fork);
+	// }
+	// else
+	// {
+	// 	pthread_mutex_unlock(&seat->fork);
+	// 	pthread_mutex_unlock(&seat->next->fork);
+	// }
 	return (true);
 }
 
@@ -81,6 +92,8 @@ static void	*routine(void *arg)
 		pthread_mutex_unlock(&seat->philo.m_meal);
 		print_state(seat, SLEEPING);
 		ft_usleep(seat, seat->data->time_to_sleep);
+		// if (seat->data->philo_count % 3 == 0)
+		// 	ft_usleep(seat, seat->data->time_to_eat);
 	}
 	return (NULL);
 }
