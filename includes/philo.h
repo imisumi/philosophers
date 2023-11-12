@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 21:15:55 by ichiro            #+#    #+#             */
-/*   Updated: 2023/11/10 22:21:21 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/12 20:01:46 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,14 +51,6 @@ enum e_action
 	THINKING
 };
 
-// typedef struct s_mutex_fork
-// {
-// 	pthread_mutex_t	m_fork;
-// 	bool			locked;
-// 	pthread_mutex_t	m_lock;
-// }	t_mutex_fork;
-
-
 typedef struct s_philo
 {
 	int				id;
@@ -71,8 +63,6 @@ typedef struct s_philo
 	pthread_t		thread;
 }	t_philo;
 
-
-
 typedef struct s_seat
 {
 	bool			head;
@@ -80,7 +70,6 @@ typedef struct s_seat
 	t_philo			philo;
 
 	pthread_mutex_t	fork;
-	// t_mutex_fork	f;
 
 	struct s_data	*data;
 	struct s_seat	*next;
@@ -125,5 +114,8 @@ bool	is_philo_dead(t_seat *seat);
 // MAIN.C
 void	finalize(t_data *data, int index);
 bool	philo_can_continue(t_seat *seat);
+
+// ROUTINE.C
+void	*routine(void *arg);
 
 #endif

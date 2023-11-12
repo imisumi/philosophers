@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/10 22:32:45 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/12 19:18:42 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,18 +45,6 @@ bool	ft_usleep(t_seat *seat, int64_t time_to)
 	return (true);
 }
 
-bool	print_state(t_seat *seat, enum e_action action)
-{
-	const char	*table[] = {"has taken a fork", "is eating", "is sleeping", "is thinking"};
-
-	if (is_philo_dead(seat) == true)
-		return (false);
-	pthread_mutex_lock(&seat->data->m_print);
-	printf("%ld	%d %s\n", current_time() - seat->data->start_time, seat->philo.id, table[action]);
-	pthread_mutex_unlock(&seat->data->m_print);
-	return (true);
-}
-
 bool	is_philo_dead(t_seat *seat)
 {
 	bool	dead;
@@ -65,4 +53,25 @@ bool	is_philo_dead(t_seat *seat)
 	dead = seat->data->dead;
 	pthread_mutex_unlock(&seat->data->m_state);
 	return (dead);
+}
+
+bool	print_state(t_seat *seat, enum e_action action)
+{
+	int64_t		time_stamp;
+	const char	*table[] = {
+		"has taken a fork",
+		"is eating",
+		"is sleeping",
+		"is thinking"};
+
+	pthread_mutex_lock(&seat->data->m_print);
+	if (is_philo_dead(seat) == true)
+	{
+		pthread_mutex_unlock(&seat->data->m_print);
+		return (false);
+	}
+	time_stamp = current_time() - seat->data->start_time;
+	printf("%ld	%d %s\n", time_stamp, seat->philo.id, table[action]);
+	pthread_mutex_unlock(&seat->data->m_print);
+	return (true);
 }

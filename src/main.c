@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/10 21:22:43 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/12 19:17:08 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ void	finalize(t_data *data, int index)
 	}
 	free_seats(data->seats);
 	pthread_mutex_destroy(&data->m_state);
+	pthread_mutex_destroy(&data->m_print);
 }
 
 bool	philo_can_continue(t_seat *seat)

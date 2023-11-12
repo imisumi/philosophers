@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/10 22:32:55 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/12 19:16:58 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,23 +54,27 @@ static bool	init_mutexes(t_data *data)
 	int		i;
 	t_seat	*current;
 
-	i = 0;
+	i = -1;
 	current = data->seats;
-	while (i < data->philo_count)
+	while (++i < data->philo_count)
 	{
 		current->philo.meal_count = data->times_to_eat;
 		if (pthread_mutex_init(&current->fork, NULL) != 0)
 			return (destroy_mutexes(data, i));
 		if (pthread_mutex_init(&current->philo.m_meal, NULL) != 0)
-			return (pthread_mutex_destroy(&current->fork), destroy_mutexes(data, i));
+		{
+			pthread_mutex_destroy(&current->fork);
+			return (destroy_mutexes(data, i));
+		}
 		current = current->next;
-		i++;
 	}
 	if (pthread_mutex_init(&data->m_state, NULL) != 0)
 		return (destroy_mutexes(data, i));
-	//! TODO protect
 	if (pthread_mutex_init(&data->m_print, NULL) != 0)
+	{
+		pthread_mutex_destroy(&data->m_state);
 		return (destroy_mutexes(data, i));
+	}
 	return (true);
 }
 
