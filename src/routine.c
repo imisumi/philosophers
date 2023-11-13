@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/12 20:06:18 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/13 03:31:05 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,19 +59,45 @@ static bool	meal_time(t_seat *seat)
 	return (true);
 }
 
+// static bool	philo_think(t_seat	*seat)
+// {
+// 	int64_t	think_time;
+
+// 	if (print_state(seat, THINKING) == false)
+// 		return (false);
+// 	if (seat->data->philo_count % 2 == 0)
+// 		return (true);
+// 	think_time = (seat->data->time_to_eat * 2) - seat->data->time_to_sleep;
+// 	if (think_time > seat->data->time_to_eat)
+// 		ft_usleep(seat, seat->data->time_to_eat / 2);
+// 	else if (think_time >= 0)
+// 		ft_usleep(seat, think_time);
+// 	return (true);
+// }
+
 static bool	philo_think(t_seat	*seat)
 {
 	int64_t	think_time;
+	int64_t	eat_time;
+	int64_t	sleep_time;
+	int64_t	max_think;
 
 	if (print_state(seat, THINKING) == false)
 		return (false);
 	if (seat->data->philo_count % 2 == 0)
 		return (true);
-	think_time = (seat->data->time_to_eat * 2) - seat->data->time_to_sleep;
-	if (think_time > seat->data->time_to_eat)
-		ft_usleep(seat, seat->data->time_to_eat / 2);
-	else if (think_time >= 0)
+	eat_time = seat->data->time_to_eat;
+	max_think = (eat_time * 2) - eat_time / 2;
+	sleep_time = seat->data->time_to_sleep;
+	think_time = (eat_time * 2) - sleep_time;
+	if (think_time > max_think)
+		ft_usleep(seat, max_think - sleep_time);
+	else if (think_time > 0)
 		ft_usleep(seat, think_time);
+	// if (think_time > eat_time)
+	// 	ft_usleep(seat, eat_time / 2);
+	// else if (think_time >= 0)
+	// 	ft_usleep(seat, think_time);
 	return (true);
 }
 
