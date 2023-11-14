@@ -6,14 +6,14 @@
 #    By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/28 00:51:40 by ichiro            #+#    #+#              #
-#    Updated: 2023/11/12 20:01:57 by imisumi-wsl      ###   ########.fr        #
+#    Updated: 2023/11/14 22:00:45 by imisumi-wsl      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = philo
 
-CFLAGS = -g -pthread
-CFLAGS += -Wall -Wextra -Werror
+CFLAGS = -g -pthread -O3
+# CFLAGS += -Wall -Wextra -Werror -O3
 
 cc = gcc
 
@@ -30,7 +30,8 @@ SRCS =	main.c \
 		setup.c \
 		seat.c \
 		utils.c \
-		routine.c
+		routine.c \
+		utils2.c
 
 OBJS = $(addprefix $(OBJS_DIR)/,$(SRCS:.c=.o))
 

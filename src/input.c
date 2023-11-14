@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   input.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/09 13:18:55 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/11/14 20:57:16 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,8 @@
 
 static void	error_msg(char *str)
 {
-	write(STDERR_FILENO, str, ft_strlen(str));
+	(void)str;
+	// write(STDERR_FILENO, str, ft_strlen(str));
 }
 
 static bool	str_num_only(char *str)

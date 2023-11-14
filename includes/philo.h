@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 21:15:55 by ichiro            #+#    #+#             */
-/*   Updated: 2023/11/12 20:01:46 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/14 20:55:07 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,8 @@
 # define MAGENTA ""
 # define RESET ""
 
+typedef pthread_mutex_t	t_mutex;
+
 enum e_action
 {
 	FORK,
@@ -55,12 +57,13 @@ typedef struct s_philo
 {
 	int				id;
 
-	int				meal_count;
+	int64_t				meal_count;
 
 	int64_t			last_meal;
 	pthread_mutex_t	m_meal;
 
 	pthread_t		thread;
+	bool			full;
 }	t_philo;
 
 typedef struct s_seat
@@ -86,8 +89,14 @@ typedef struct s_data
 	int64_t			start_time;
 	t_seat			*seats;
 	bool			dead;
+
+	int64_t			sitting_philos;
+	bool			monitoring;
+
 	pthread_mutex_t	m_state;
 	pthread_mutex_t	m_print;
+	pthread_mutex_t	m_philo;
+	pthread_mutex_t	m_monitor;
 }	t_data;
 
 // INPUT.C
@@ -117,5 +126,10 @@ bool	philo_can_continue(t_seat *seat);
 
 // ROUTINE.C
 void	*routine(void *arg);
+
+int64_t	mutex_inc_int64(t_mutex *mutex, int64_t *value);
+int64_t	mutex_get_int64(t_mutex *mutex, int64_t *value);
+bool	mutex_get_bool(t_mutex *mutex, bool *value);
+void	mutex_set_bool(t_mutex *mutex, bool *value, bool new_value);
 
 #endif
