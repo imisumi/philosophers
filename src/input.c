@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/14 20:57:16 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/14 23:55:04 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,7 @@
 
 static void	error_msg(char *str)
 {
-	(void)str;
-	// write(STDERR_FILENO, str, ft_strlen(str));
+	printf("%s", str);
 }
 
 static bool	str_num_only(char *str)

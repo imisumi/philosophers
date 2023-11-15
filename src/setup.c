@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/14 20:16:59 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/15 01:14:11 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,31 @@ static bool	destroy_mutexes(t_data *data, int i)
 	return (false);
 }
 
+static bool	data_mutexes(t_data *data, int i)
+{
+	if (pthread_mutex_init(&data->m_state, NULL) != 0)
+		return (destroy_mutexes(data, i));
+	if (pthread_mutex_init(&data->m_print, NULL) != 0)
+	{
+		pthread_mutex_destroy(&data->m_state);
+		return (destroy_mutexes(data, i));
+	}
+	if (pthread_mutex_init(&data->m_philo, NULL) != 0)
+	{
+		pthread_mutex_destroy(&data->m_state);
+		pthread_mutex_destroy(&data->m_print);
+		return (destroy_mutexes(data, i));
+	}
+	if (pthread_mutex_init(&data->m_monitor, NULL) != 0)
+	{
+		pthread_mutex_destroy(&data->m_state);
+		pthread_mutex_destroy(&data->m_print);
+		pthread_mutex_destroy(&data->m_philo);
+		return (destroy_mutexes(data, i));
+	}
+	return (true);
+}
+
 static bool	init_mutexes(t_data *data)
 {
 	int		i;
@@ -68,17 +93,7 @@ static bool	init_mutexes(t_data *data)
 		}
 		current = current->next;
 	}
-	if (pthread_mutex_init(&data->m_state, NULL) != 0)
-		return (destroy_mutexes(data, i));
-	if (pthread_mutex_init(&data->m_print, NULL) != 0)
-	{
-		pthread_mutex_destroy(&data->m_state);
-		return (destroy_mutexes(data, i));
-	}
-	//! TODO
-	if (pthread_mutex_init(&data->m_philo, NULL) != 0)
-		return (false);
-	if (pthread_mutex_init(&data->m_monitor, NULL) != 0)
+	if (data_mutexes(data, i) == false)
 		return (false);
 	return (true);
 }

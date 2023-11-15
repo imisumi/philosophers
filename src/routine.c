@@ -6,135 +6,27 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/14 23:40:36 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/15 03:45:52 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philo.h"
 
-static bool	pickup_fork(t_seat *seat, pthread_mutex_t *m1, pthread_mutex_t *m2)
-{
-	pthread_mutex_lock(m1);
-	if (print_state(seat, FORK) == false)
-	{
-		pthread_mutex_unlock(m1);
-		return (false);
-	}
-	if (seat->data->philo_count == 1)
-	{
-		pthread_mutex_unlock(m1);
-		return (false);
-	}
-	pthread_mutex_lock(m2);
-	if (print_state(seat, FORK) == false)
-	{
-		pthread_mutex_unlock(m2);
-		pthread_mutex_unlock(m1);
-		return (false);
-	}
-	return (true);
-}
-
-static bool	meal_time(t_seat *seat)
-{
-	if (seat->philo.id % 2)
-	{
-		if (pickup_fork(seat, &seat->next->fork, &seat->fork) == false)
-			return (false);
-	}
-	else
-	{
-		if (pickup_fork(seat, &seat->fork, &seat->next->fork) == false)
-			return (false);
-	}
-	pthread_mutex_lock(&seat->philo.m_meal);
-	seat->philo.last_meal = current_time();
-	// if (seat->philo.meal_count != -1)
-	// 	seat->philo.meal_count--;
-	pthread_mutex_unlock(&seat->philo.m_meal);
-	print_state(seat, EATING);
-	ft_usleep(seat, seat->data->time_to_eat);
-	
-	if (seat->philo.meal_count != -1)
-	{
-		pthread_mutex_lock(&seat->philo.m_meal);
-		seat->philo.meal_count--;
-		pthread_mutex_unlock(&seat->philo.m_meal);
-	}
-
-	// pthread_mutex_unlock(&seat->next->fork);
-	// pthread_mutex_unlock(&seat->fork);
-	if (seat->philo.id % 2)
-	{
-		pthread_mutex_unlock(&seat->fork);
-		pthread_mutex_unlock(&seat->next->fork);
-	}
-	else
-	{
-		pthread_mutex_unlock(&seat->next->fork);
-		pthread_mutex_unlock(&seat->fork);
-	}
-	return (true);
-}
-
-// static bool	philo_think(t_seat	*seat)
-// {
-// 	int64_t	think_time;
-
-// 	if (print_state(seat, THINKING) == false)
-// 		return (false);
-// 	if (seat->data->philo_count % 2 == 0)
-// 		return (true);
-// 	think_time = (seat->data->time_to_eat * 2) - seat->data->time_to_sleep;
-// 	if (think_time > seat->data->time_to_eat)
-// 		ft_usleep(seat, seat->data->time_to_eat / 2);
-// 	else if (think_time >= 0)
-// 		ft_usleep(seat, think_time);
-// 	return (true);
-// }
-
 static bool	philo_think(t_seat	*seat)
 {
-	int64_t	think_time;
 	int64_t	eat_time;
 	int64_t	sleep_time;
-	int64_t	max_think;
+	int64_t	think_time;
 
 	if (print_state(seat, THINKING) == false)
 		return (false);
 	if (seat->data->philo_count % 2 == 0)
 		return (true);
-
 	eat_time = seat->data->time_to_eat;
 	sleep_time = seat->data->time_to_sleep;
-	// printf("think %ld\n", (eat_time * 2) - (eat_time / 2) - sleep_time);
-	// exit(0);
-	max_think = (eat_time * 2) - (eat_time / 2) - sleep_time;
+	think_time = (eat_time * 2) - (eat_time / 2) - sleep_time;
 	if (eat_time >= sleep_time)
-	{
-		ft_usleep(seat, max_think);
-		return (true);
-	}
-	// else if (eat_time >= 0)
-	// 	ft_usleep(seat, (eat_time * 2) - sleep_time);
-	return (true);
-
-	eat_time = seat->data->time_to_eat;
-	max_think = (eat_time * 2) - eat_time / 2;
-	sleep_time = seat->data->time_to_sleep;
-	think_time = (eat_time * 2) - sleep_time;
-	// printf("think time %ld\n", think_time);
-	// printf("max think %ld\n", max_think);
-	// printf("sub %ld\n", max_think - sleep_time);
-	// exit(0);
-	if (think_time > max_think)
-		ft_usleep(seat, max_think - sleep_time);
-	else if (think_time > 0)
 		ft_usleep(seat, think_time);
-	// if (think_time > eat_time)
-	// 	ft_usleep(seat, eat_time / 2);
-	// else if (think_time >= 0)
-	// 	ft_usleep(seat, think_time);
 	return (true);
 }
 
@@ -142,6 +34,7 @@ static void	separate_philos(t_seat *seat)
 {
 	int64_t	think_time;
 
+	print_state(seat, THINKING);
 	think_time = (seat->data->time_to_eat * 2) - seat->data->time_to_sleep;
 	if (seat->data->philo_count % 2 == 0)
 	{
@@ -160,7 +53,7 @@ static void	separate_philos(t_seat *seat)
 	}
 }
 
-bool	sleep_time(t_seat *seat)
+static bool	sleep_time(t_seat *seat)
 {
 	if (print_state(seat, SLEEPING) == false)
 		return (false);
@@ -168,34 +61,27 @@ bool	sleep_time(t_seat *seat)
 	return (true);
 }
 
-void	sync_philos(t_seat *seat)
+static void	sync_philos(t_seat *seat)
 {
 	pthread_mutex_lock(&seat->data->m_state);
 	pthread_mutex_unlock(&seat->data->m_state);
-	if (mutex_inc_int64(&seat->data->m_philo, &seat->data->sitting_philos) == seat->data->philo_count)
+	seat->philo.last_meal = seat->data->start_time;
+	if (mutex_inc_int64(&seat->data->m_philo, &seat->data->sitting_philos) \
+							== seat->data->philo_count)
 		mutex_set_bool(&seat->data->m_monitor, &seat->data->monitoring, true);
 }
 
 void	*routine(void *arg)
 {
 	t_seat	*seat;
-	
+
 	seat = arg;
 	sync_philos(seat);
-	// pthread_mutex_lock(&seat->data->m_state);
-	// pthread_mutex_unlock(&seat->data->m_state);
-	// if (mutex_inc_int64(&seat->data->m_philo, &seat->data->sitting_philos) == seat->data->philo_count)
-	// 	mutex_set_bool(&seat->data->m_monitor, &seat->data->monitoring, true);
 	separate_philos(seat);
-	seat->philo.last_meal = seat->data->start_time;
 	while (philo_can_continue(seat) == true)
 	{
 		if (meal_time(seat) == false)
 			return (NULL);
-		pthread_mutex_lock(&seat->philo.m_meal);
-		if (seat->philo.meal_count == 0)
-			return (pthread_mutex_unlock(&seat->philo.m_meal), NULL);
-		pthread_mutex_unlock(&seat->philo.m_meal);
 		if (sleep_time(seat) == false)
 			return (NULL);
 		philo_think(seat);

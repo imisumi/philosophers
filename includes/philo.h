@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 21:15:55 by ichiro            #+#    #+#             */
-/*   Updated: 2023/11/14 20:55:07 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/15 02:57:45 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ typedef struct s_philo
 {
 	int				id;
 
-	int64_t				meal_count;
+	int64_t			meal_count;
 
 	int64_t			last_meal;
 	pthread_mutex_t	m_meal;
@@ -128,8 +128,15 @@ bool	philo_can_continue(t_seat *seat);
 void	*routine(void *arg);
 
 int64_t	mutex_inc_int64(t_mutex *mutex, int64_t *value);
+void	mutex_dec_int64(t_mutex *mutex, int64_t *value);
 int64_t	mutex_get_int64(t_mutex *mutex, int64_t *value);
 bool	mutex_get_bool(t_mutex *mutex, bool *value);
 void	mutex_set_bool(t_mutex *mutex, bool *value, bool new_value);
+
+// EAT.C
+bool	meal_time(t_seat *seat);
+
+// MONITOR.C
+void	monitoring(t_data *data);
 
 #endif
