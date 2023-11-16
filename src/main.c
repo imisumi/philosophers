@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
+/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/16 03:51:13 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/16 13:47:33 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,41 +38,6 @@ void	destory_meals(t_data *data)
 	free(data->m_meals);
 }
 
-int64_t	current_time(void)
-{
-	struct timeval	tv;
-
-	gettimeofday(&tv, NULL);
-	return ((tv.tv_sec) * 1000 + (tv.tv_usec) / 1000);
-}
-
-bool	create_threads(t_data *data)
-{
-	int	i;
-
-	i = 0;
-	data->threads = malloc(sizeof(pthread_t) * data->philo_count);
-	if (data->threads == NULL)
-		return (error_msg("Malloc error\n"), false);
-	pthread_mutex_lock(&data->m_state);
-	data->dead = false;
-	data->start_time = current_time();
-	while (i < data->philo_count)
-	{
-		// data->philos[i].last_meal = data->start_time;
-		data->philos[i].data = data;
-		data->philos[i].full = false;
-		if (pthread_create(&data->threads[i], NULL, &routine, &data->philos[i]) != 0)
-		{
-			error_msg("Thread create error\n");
-			return (false);
-		}
-		i++;
-	}
-	data->start_time = current_time();
-	pthread_mutex_unlock(&data->m_state);
-	return (true);
-}
 
 bool	create_philos(t_data *data)
 {
@@ -142,125 +107,6 @@ bool	init_mutexes(t_data *data)
 	}
 	pthread_mutex_init(&data->m_state, NULL);
 	return (true);
-}
-
-// void	monitor_philos(t_data *data)
-// {
-// 	int		i;
-// 	int		j;
-// 	int64_t	meal_count;
-// 	int64_t	last_meal;
-// 	int64_t	full_philos;
-
-// 	i = 0;
-// 	full_philos = 0;
-// 	while (full_philos != data->philo_count)
-// 	{
-// 		i = 0;
-// 		while (i < data->philo_count)
-// 		{
-// 			// if (data->philos[i].full == false)
-// 			// {
-// 			// 	pthread_mutex_lock(&data->m_state);
-// 			// 	last_meal = current_time() - data->philos[i].last_meal;
-// 			// 	meal_count = data->philos[i].meal_count;
-// 			// 	if (meal_count == data->times_to_eat)
-// 			// 	{
-// 			// 		data->philos[i].full = true;
-// 			// 		full_philos++;
-// 			// 		if (full_philos == data->philo_count)
-// 			// 		{
-// 			// 			pthread_mutex_unlock(&data->m_state);
-// 			// 			return ;
-// 			// 		}
-// 			// 	}
-// 			// 	else if (last_meal >= data->time_to_die)
-// 			// 	{
-// 			// 		printf("time to die = %ld\n", data->time_to_die);
-// 			// 		printf("last meal = %ld\n", last_meal);
-// 			// 		data->dead = true;
-// 			// 		printf("%ld	%d died\n", current_time() - \
-// 			// 			data->start_time, data->philos[i].id);
-// 			// 		pthread_mutex_unlock(&data->m_state);
-// 			// 		printf("full_philos = %ld\n", meal_count);
-// 			// 		printf("full_philos = %ld\n", data->times_to_eat);
-// 			// 		return ;
-// 			// 	}
-// 			// 	pthread_mutex_unlock(&data->m_state);
-// 			// }
-// 			i++;
-// 		}
-// 		usleep(1);
-// 	}
-// }
-
-void	monitor_philos(t_data *data)
-{
-	int		i;
-	int		j;
-	int64_t	meal_count;
-	int64_t	last_meal;
-	int64_t	full_philos;
-
-	i = 0;
-	full_philos = 0;
-	int x = 0;
-	while (full_philos != data->philo_count)
-	{
-		i = 0;
-		while (i < data->philo_count)
-		{
-			if (data->philos[i].full == false)
-			{
-				pthread_mutex_lock(&data->m_state);
-				pthread_mutex_lock(data->philos[i].m_meal);
-				last_meal = current_time() - data->philos[i].last_meal;
-				meal_count = data->philos[i].meal_count;
-				if (meal_count == data->times_to_eat)
-				{
-					data->philos[i].full = true;
-					full_philos++;
-					if (full_philos == data->philo_count)
-					{
-						pthread_mutex_unlock(data->philos[i].m_meal);
-						pthread_mutex_unlock(&data->m_state);
-						return ;
-					}
-				}
-				else if (last_meal >= data->time_to_die)
-				{
-					
-					// printf("time to die = %ld\n", data->time_to_die);
-					// printf("last meal = %ld\n", last_meal);
-					data->dead = true;
-					printf("%ld	%d died\n", current_time() - \
-						data->start_time, data->philos[i].id);
-					// printf("full_philos = %ld\n", meal_count);
-					// printf("full_philos = %ld\n", data->times_to_eat);
-					pthread_mutex_unlock(data->philos[i].m_meal);
-					pthread_mutex_unlock(&data->m_state);
-					return ;
-				}
-				pthread_mutex_unlock(data->philos[i].m_meal);
-				pthread_mutex_unlock(&data->m_state);
-			}
-			i++;
-		}
-		usleep(1);
-		// if (x == 1000000)
-		// 	break ;
-		// x++;
-	}
-}
-
-int64_t	mutex_get_int64(t_mutex *mutex, int64_t *value)
-{
-	int64_t	tmp;
-
-	pthread_mutex_lock(mutex);
-	tmp = *value;
-	pthread_mutex_unlock(mutex);
-	return (tmp);
 }
 
 //? do I print sleeping and thinking after the last meal?

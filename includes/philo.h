@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
+/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 21:15:55 by ichiro            #+#    #+#             */
-/*   Updated: 2023/11/16 03:55:10 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/16 15:05:29 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,6 @@ typedef struct s_data
 	t_mutex	*m_meals;
 	t_mutex	m_monitor;
 	t_mutex	m_state;
-	t_mutex	m_print;
 
 	pthread_t	*threads;
 }	t_data;
@@ -98,30 +97,15 @@ typedef struct s_data
 // INPUT.C
 bool	valid_input(int argc, char *argv[], t_data *data);
 
-// SEAT.c
-
-
 // THREAD.C
 bool	create_threads(t_data *data);
 
-// UTILS.C
-size_t	ft_strlen(char *str);
-int64_t	current_time(void);
-
-
 // MAIN.C
-
 
 // ROUTINE.C
 void	*routine(void *arg);
 
-
-
-void	error_msg(char *str);
-
-
 bool	print_state(t_philo *philo, t_action action);
-
 
 // PHILO_ACTIONS.C
 bool	philo_eat(t_philo	*philo);
@@ -133,8 +117,14 @@ void	thinking(t_philo *philo);
 bool	pickup_forks(t_philo	*philo);
 void	drop_forks(t_philo	*philo);
 
-bool	ft_usleep(t_philo *philo, int64_t time_to);
+// UTILS.C
 int64_t	current_time(void);
+int64_t	mutex_get_int64(t_mutex *mutex, int64_t *value);
+void	error_msg(char *str);
+size_t	ft_strlen(char *str);
+bool	ft_usleep(t_philo *philo, int64_t time_to);
 
+// MONITORING.C
+void	monitor_philos(t_data *data);
 
 #endif

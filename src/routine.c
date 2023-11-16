@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   routine.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
+/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/16 04:00:19 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/16 15:06:00 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,25 +34,7 @@ bool	print_state(t_philo *philo, t_action action)
 	return (true);
 }
 
-bool	ft_usleep(t_philo *philo, int64_t time_to)
-{
-	int64_t	start;
-	bool	dead;
 
-	start = current_time();
-	while (current_time() - start < time_to)
-	{
-		// if (is_philo_dead(seat) == true)
-		// 	return (false);
-		usleep(500);
-		pthread_mutex_lock(&philo->data->m_state);
-		dead = philo->data->dead;
-		pthread_mutex_unlock(&philo->data->m_state);
-		if (dead == true)
-			return (false);
-	}
-	return (true);
-}
 
 // void	thinking(t_philo *philo)
 // {
@@ -80,11 +62,6 @@ bool	desync_philos(t_philo	*philo)
 				return (false);
 			ft_usleep(philo, philo->data->time_to_eat / 2);
 		}
-		// else
-		// {
-		// 	pthread_mutex_lock(&philo->data->m_state);
-		// 	pthread_mutex_unlock(&philo->data->m_state);
-		// }
 	}
 	else
 	{
@@ -94,11 +71,6 @@ bool	desync_philos(t_philo	*philo)
 				return (false);
 			thinking(philo);
 		}
-		// else
-		// {
-		// 	pthread_mutex_lock(&philo->data->m_state);
-		// 	pthread_mutex_unlock(&philo->data->m_state);
-		// }
 	}
 	return (true);
 }
@@ -111,9 +83,6 @@ void	*routine(void *arg)
 	pthread_mutex_lock(&philo->data->m_state);
 	pthread_mutex_unlock(&philo->data->m_state);
 	philo->last_meal = philo->data->start_time;
-	// if (print_state(philo, THINKING) == false)
-	// 	return (false);
-
 	pthread_mutex_lock(&philo->data->m_monitor);
 	philo->data->monitoring++;
 	pthread_mutex_unlock(&philo->data->m_monitor);
