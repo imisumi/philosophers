@@ -6,85 +6,128 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/15 03:45:52 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/16 04:00:19 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philo.h"
 
-static bool	philo_think(t_seat	*seat)
+bool	print_state(t_philo *philo, t_action action)
 {
-	int64_t	eat_time;
-	int64_t	sleep_time;
-	int64_t	think_time;
+	int64_t		time_stamp;
+	const char	*table[] = {
+		"has taken a fork",
+		"is eating",
+		"is sleeping",
+		"is thinking"};
 
-	if (print_state(seat, THINKING) == false)
+	// time_stamp = current_time() - philo->data->start_time;
+	pthread_mutex_lock(&philo->data->m_state);
+	if (philo->data->dead == true)
+	{
+		pthread_mutex_unlock(&philo->data->m_state);
 		return (false);
-	if (seat->data->philo_count % 2 == 0)
-		return (true);
-	eat_time = seat->data->time_to_eat;
-	sleep_time = seat->data->time_to_sleep;
-	think_time = (eat_time * 2) - (eat_time / 2) - sleep_time;
-	if (eat_time >= sleep_time)
-		ft_usleep(seat, think_time);
+	}
+	time_stamp = current_time() - philo->data->start_time;
+	printf("%ld	%d %s\n", time_stamp, philo->id, table[action]);
+	pthread_mutex_unlock(&philo->data->m_state);
 	return (true);
 }
 
-static void	separate_philos(t_seat *seat)
+bool	ft_usleep(t_philo *philo, int64_t time_to)
 {
-	int64_t	think_time;
+	int64_t	start;
+	bool	dead;
 
-	print_state(seat, THINKING);
-	think_time = (seat->data->time_to_eat * 2) - seat->data->time_to_sleep;
-	if (seat->data->philo_count % 2 == 0)
+	start = current_time();
+	while (current_time() - start < time_to)
 	{
-		if (seat->philo.id % 2 == 0)
-			ft_usleep(seat, seat->data->time_to_eat / 2);
+		// if (is_philo_dead(seat) == true)
+		// 	return (false);
+		usleep(500);
+		pthread_mutex_lock(&philo->data->m_state);
+		dead = philo->data->dead;
+		pthread_mutex_unlock(&philo->data->m_state);
+		if (dead == true)
+			return (false);
+	}
+	return (true);
+}
+
+// void	thinking(t_philo *philo)
+// {
+// 	int64_t	t_eat;
+// 	int64_t	t_sleep;
+// 	int64_t	t_think;
+
+// 	if (philo->data->philo_count % 2 == 0)
+// 		return ;
+// 	t_eat = philo->data->time_to_eat;
+// 	t_sleep = philo->data->time_to_sleep;
+// 	t_think = (t_eat * 2) - t_sleep;
+// 	if (t_think < 0)
+// 		t_think = 0;
+// 	ft_usleep(philo, t_think * 0.42);
+// }
+// Synchronize the philos to minimize
+bool	desync_philos(t_philo	*philo)
+{
+	if (philo->data->philo_count % 2 == 0)
+	{
+		if (philo->id % 2 == 0)
+		{
+			if (print_state(philo, THINKING) == false)
+				return (false);
+			ft_usleep(philo, philo->data->time_to_eat / 2);
+		}
+		// else
+		// {
+		// 	pthread_mutex_lock(&philo->data->m_state);
+		// 	pthread_mutex_unlock(&philo->data->m_state);
+		// }
 	}
 	else
 	{
-		if (seat->philo.id % 2 == 0)
+		if (philo->id % 2)
 		{
-			if (think_time >= seat->data->time_to_eat)
-				ft_usleep(seat, seat->data->time_to_eat / 2);
-			else if (think_time >= 0)
-				ft_usleep(seat, think_time);
+			if (print_state(philo, THINKING) == false)
+				return (false);
+			thinking(philo);
 		}
+		// else
+		// {
+		// 	pthread_mutex_lock(&philo->data->m_state);
+		// 	pthread_mutex_unlock(&philo->data->m_state);
+		// }
 	}
-}
-
-static bool	sleep_time(t_seat *seat)
-{
-	if (print_state(seat, SLEEPING) == false)
-		return (false);
-	ft_usleep(seat, seat->data->time_to_sleep);
 	return (true);
-}
-
-static void	sync_philos(t_seat *seat)
-{
-	pthread_mutex_lock(&seat->data->m_state);
-	pthread_mutex_unlock(&seat->data->m_state);
-	seat->philo.last_meal = seat->data->start_time;
-	if (mutex_inc_int64(&seat->data->m_philo, &seat->data->sitting_philos) \
-							== seat->data->philo_count)
-		mutex_set_bool(&seat->data->m_monitor, &seat->data->monitoring, true);
 }
 
 void	*routine(void *arg)
 {
-	t_seat	*seat;
+	t_philo	*philo;
 
-	seat = arg;
-	sync_philos(seat);
-	separate_philos(seat);
-	while (philo_can_continue(seat) == true)
+	philo = (t_philo *)arg;
+	pthread_mutex_lock(&philo->data->m_state);
+	pthread_mutex_unlock(&philo->data->m_state);
+	philo->last_meal = philo->data->start_time;
+	// if (print_state(philo, THINKING) == false)
+	// 	return (false);
+
+	pthread_mutex_lock(&philo->data->m_monitor);
+	philo->data->monitoring++;
+	pthread_mutex_unlock(&philo->data->m_monitor);
+
+	if (desync_philos(philo) == false)
+		return (NULL);
+	while (true)
 	{
-		if (meal_time(seat) == false)
+		if (philo_eat(philo) == false)
 			return (NULL);
-		if (sleep_time(seat) == false)
+		if (philo_sleep(philo) == false)
 			return (NULL);
-		philo_think(seat);
+		if (philo_think(philo) == false)
+			return (NULL);
 	}
 	return (NULL);
 }

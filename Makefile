@@ -6,14 +6,14 @@
 #    By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/28 00:51:40 by ichiro            #+#    #+#              #
-#    Updated: 2023/11/15 02:40:07 by imisumi-wsl      ###   ########.fr        #
+#    Updated: 2023/11/16 02:10:37 by imisumi-wsl      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = philo
 
 CFLAGS = -g -pthread
-CFLAGS += -Wall -Wextra -Werror
+# CFLAGS += -Wall -Wextra -Werror
 
 cc = gcc
 
@@ -26,14 +26,9 @@ NC := \033[0m
 
 SRCS =	main.c \
 		input.c \
-		thread.c \
-		setup.c \
-		seat.c \
-		utils.c \
 		routine.c \
-		utils2.c \
-		eat.c \
-		monitoring.c
+		philo_actions.c \
+		philo_actions_utils.c
 
 OBJS = $(addprefix $(OBJS_DIR)/,$(SRCS:.c=.o))
 

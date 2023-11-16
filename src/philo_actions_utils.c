@@ -1,42 +1,38 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   thread.c                                           :+:      :+:    :+:   */
+/*   philo_actions_utils.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/15 03:42:23 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/16 02:18:39 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philo.h"
 
-bool	create_threads(t_data *data)
+bool	pickup_forks(t_philo	*philo)
 {
-	int		i;
-	t_seat	*current;
-
-	i = 0;
-	current = data->seats;
-	data->monitoring = false;
-	data->sitting_philos = 0;
-	pthread_mutex_lock(&data->m_state);
-	while (i < data->philo_count)
+	pthread_mutex_lock(philo->m_fork_1);
+	if (print_state(philo, FORK) == false)
 	{
-		current->philo.full = false;
-		if (pthread_create(&current->philo.thread, NULL, \
-				&routine, current) != 0)
-		{
-			data->dead = true;
-			pthread_mutex_unlock(&data->m_state);
-			finalize(data, i);
-			return (false);
-		}
-		current = current->next;
-		i++;
+		pthread_mutex_unlock(philo->m_fork_1);
+		return (false);
 	}
-	data->start_time = current_time();
-	pthread_mutex_unlock(&data->m_state);
+	pthread_mutex_lock(philo->m_fork_2);
+	if (print_state(philo, FORK) == false)
+	{
+		pthread_mutex_unlock(philo->m_fork_1);
+		pthread_mutex_unlock(philo->m_fork_2);
+		return (false);
+	}
 	return (true);
 }
+
+void	drop_forks(t_philo	*philo)
+{
+	pthread_mutex_unlock(philo->m_fork_1);
+	pthread_mutex_unlock(philo->m_fork_2);
+}
+

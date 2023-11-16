@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 21:15:55 by ichiro            #+#    #+#             */
-/*   Updated: 2023/11/15 02:57:45 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/16 03:55:10 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@
 # include <pthread.h>
 # include <stdbool.h>
 # include <math.h>
+# include <string.h>
 
 // # define RED "\x1b[1;31m"
 // # define BLUE "\x1b[1;34m"
@@ -44,71 +45,61 @@
 # define RESET ""
 
 typedef pthread_mutex_t	t_mutex;
+typedef struct s_data	t_data;
 
-enum e_action
+typedef enum e_action
 {
 	FORK,
 	EATING,
 	SLEEPING,
 	THINKING
-};
+}	t_action;
 
 typedef struct s_philo
 {
-	int				id;
+	int			id;
 
-	int64_t			meal_count;
+	int64_t		meal_count;
 
-	int64_t			last_meal;
-	pthread_mutex_t	m_meal;
+	int64_t		last_meal;
+	t_mutex		*m_meal;
 
-	pthread_t		thread;
-	bool			full;
+	t_mutex		*m_fork_1;
+	t_mutex		*m_fork_2;
+	
+	bool		full;
+
+	t_data		*data;
 }	t_philo;
-
-typedef struct s_seat
-{
-	bool			head;
-
-	t_philo			philo;
-
-	pthread_mutex_t	fork;
-
-	struct s_data	*data;
-	struct s_seat	*next;
-	struct s_seat	*prev;
-}	t_seat;
 
 typedef struct s_data
 {
-	int64_t			philo_count;
-	int64_t			time_to_die;
-	int64_t			time_to_eat;
-	int64_t			time_to_sleep;
-	int64_t			times_to_eat;
-	int64_t			start_time;
-	t_seat			*seats;
-	bool			dead;
+	int64_t	philo_count;
+	int64_t	time_to_die;
+	int64_t	time_to_eat;
+	int64_t	time_to_sleep;
+	int64_t	times_to_eat;
+	int64_t	start_time;
+	bool	dead;
 
-	int64_t			sitting_philos;
-	bool			monitoring;
+	int64_t	monitoring;
 
-	pthread_mutex_t	m_state;
-	pthread_mutex_t	m_print;
-	pthread_mutex_t	m_philo;
-	pthread_mutex_t	m_monitor;
+	t_philo	*philos;
+
+	t_mutex	*m_forks;
+	t_mutex	*m_meals;
+	t_mutex	m_monitor;
+	t_mutex	m_state;
+	t_mutex	m_print;
+
+	pthread_t	*threads;
 }	t_data;
 
 // INPUT.C
 bool	valid_input(int argc, char *argv[], t_data *data);
 
 // SEAT.c
-void	free_seat_fail(t_seat *head);
-t_seat	*create_seat_node(t_data *data);
-void	insert_seat(t_seat **head, t_seat *new);
 
-// SETUP.C
-bool	setup_table(t_data *data);
 
 // THREAD.C
 bool	create_threads(t_data *data);
@@ -116,27 +107,34 @@ bool	create_threads(t_data *data);
 // UTILS.C
 size_t	ft_strlen(char *str);
 int64_t	current_time(void);
-bool	ft_usleep(t_seat *seat, int64_t time_to);
-bool	print_state(t_seat *seat, enum e_action action);
-bool	is_philo_dead(t_seat *seat);
+
 
 // MAIN.C
-void	finalize(t_data *data, int index);
-bool	philo_can_continue(t_seat *seat);
+
 
 // ROUTINE.C
 void	*routine(void *arg);
 
-int64_t	mutex_inc_int64(t_mutex *mutex, int64_t *value);
-void	mutex_dec_int64(t_mutex *mutex, int64_t *value);
-int64_t	mutex_get_int64(t_mutex *mutex, int64_t *value);
-bool	mutex_get_bool(t_mutex *mutex, bool *value);
-void	mutex_set_bool(t_mutex *mutex, bool *value, bool new_value);
 
-// EAT.C
-bool	meal_time(t_seat *seat);
 
-// MONITOR.C
-void	monitoring(t_data *data);
+void	error_msg(char *str);
+
+
+bool	print_state(t_philo *philo, t_action action);
+
+
+// PHILO_ACTIONS.C
+bool	philo_eat(t_philo	*philo);
+bool	philo_sleep(t_philo	*philo);
+bool	philo_think(t_philo	*philo);
+void	thinking(t_philo *philo);
+
+// PHILO_UTILS_ACTIONS.C
+bool	pickup_forks(t_philo	*philo);
+void	drop_forks(t_philo	*philo);
+
+bool	ft_usleep(t_philo *philo, int64_t time_to);
+int64_t	current_time(void);
+
 
 #endif
