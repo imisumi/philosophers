@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   routine.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/16 15:06:00 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/11/17 03:28:10 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@ bool	print_state(t_philo *philo, t_action action)
 		"is sleeping",
 		"is thinking"};
 
-	// time_stamp = current_time() - philo->data->start_time;
 	pthread_mutex_lock(&philo->data->m_state);
 	if (philo->data->dead == true)
 	{
@@ -34,24 +33,6 @@ bool	print_state(t_philo *philo, t_action action)
 	return (true);
 }
 
-
-
-// void	thinking(t_philo *philo)
-// {
-// 	int64_t	t_eat;
-// 	int64_t	t_sleep;
-// 	int64_t	t_think;
-
-// 	if (philo->data->philo_count % 2 == 0)
-// 		return ;
-// 	t_eat = philo->data->time_to_eat;
-// 	t_sleep = philo->data->time_to_sleep;
-// 	t_think = (t_eat * 2) - t_sleep;
-// 	if (t_think < 0)
-// 		t_think = 0;
-// 	ft_usleep(philo, t_think * 0.42);
-// }
-// Synchronize the philos to minimize
 bool	desync_philos(t_philo	*philo)
 {
 	if (philo->data->philo_count % 2 == 0)
@@ -75,6 +56,20 @@ bool	desync_philos(t_philo	*philo)
 	return (true);
 }
 
+void	*handle_single_philo(t_philo *philo)
+{
+	t_data	*data;
+
+	data = philo->data;
+	pthread_mutex_lock(philo->m_fork_1);
+	if (print_state(philo, FORK) == false)
+		return (NULL);
+	while (mutex_get_bool(&data->m_state, &data->dead) == false)
+		usleep(10);
+	pthread_mutex_unlock(philo->m_fork_1);
+	return (NULL);
+}
+
 void	*routine(void *arg)
 {
 	t_philo	*philo;
@@ -86,7 +81,8 @@ void	*routine(void *arg)
 	pthread_mutex_lock(&philo->data->m_monitor);
 	philo->data->monitoring++;
 	pthread_mutex_unlock(&philo->data->m_monitor);
-
+	if (philo->data->philo_count == 1)
+		return (handle_single_philo(philo));
 	if (desync_philos(philo) == false)
 		return (NULL);
 	while (true)

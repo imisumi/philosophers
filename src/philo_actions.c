@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/16 03:07:05 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/17 01:45:43 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,16 +25,12 @@ bool	philo_eat(t_philo	*philo)
 	philo->last_meal = current_time();
 	pthread_mutex_unlock(philo->m_meal);
 	ft_usleep(philo, philo->data->time_to_eat);
-
 	drop_forks(philo);
-	
 	pthread_mutex_lock(philo->m_meal);
-	// philo->last_meal = current_time();
 	philo->meal_count++;
 	if (philo->meal_count == philo->data->times_to_eat)
 		full = true;
 	pthread_mutex_unlock(philo->m_meal);
-
 	if (full == true)
 		return (false);
 	return (true);
@@ -50,18 +46,18 @@ bool	philo_sleep(t_philo	*philo)
 
 void	thinking(t_philo *philo)
 {
-	int64_t	t_eat;
-	int64_t	t_sleep;
-	int64_t	t_think;
+	int64_t	eat_time;
+	int64_t	sleep_time;
+	int64_t	think_time;
 
 	if (philo->data->philo_count % 2 == 0)
 		return ;
-	t_eat = philo->data->time_to_eat;
-	t_sleep = philo->data->time_to_sleep;
-	t_think = (t_eat * 2) - t_sleep;
-	if (t_think < 0)
-		t_think = 0;
-	ft_usleep(philo, t_think * 0.42);
+	eat_time = philo->data->time_to_eat;
+	sleep_time = philo->data->time_to_sleep;
+	think_time = (eat_time * 2) - sleep_time;
+	if (think_time < 0)
+		think_time = 0;
+	ft_usleep(philo, think_time * 0.42);
 }
 
 bool	philo_think(t_philo	*philo)

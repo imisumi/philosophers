@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+         #
+#    By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/28 00:51:40 by ichiro            #+#    #+#              #
-#    Updated: 2023/11/16 13:46:54 by imisumi          ###   ########.fr        #
+#    Updated: 2023/11/17 02:12:52 by imisumi-wsl      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -31,7 +31,8 @@ SRCS =	main.c \
 		philo_actions_utils.c \
 		thread.c \
 		utils.c \
-		monitoring.c
+		monitoring.c \
+		mutex.c
 
 OBJS = $(addprefix $(OBJS_DIR)/,$(SRCS:.c=.o))
 

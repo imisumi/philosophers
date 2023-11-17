@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 21:15:55 by ichiro            #+#    #+#             */
-/*   Updated: 2023/11/16 15:05:29 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/11/17 03:42:17 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ typedef struct s_philo
 
 	t_mutex		*m_fork_1;
 	t_mutex		*m_fork_2;
-	
+
 	bool		full;
 
 	t_data		*data;
@@ -74,22 +74,23 @@ typedef struct s_philo
 
 typedef struct s_data
 {
-	int64_t	philo_count;
-	int64_t	time_to_die;
-	int64_t	time_to_eat;
-	int64_t	time_to_sleep;
-	int64_t	times_to_eat;
-	int64_t	start_time;
-	bool	dead;
+	bool		dead;
 
-	int64_t	monitoring;
+	int64_t		philo_count;
+	int64_t		time_to_die;
+	int64_t		time_to_eat;
+	int64_t		time_to_sleep;
+	int64_t		times_to_eat;
+	int64_t		start_time;
 
-	t_philo	*philos;
+	int64_t		monitoring;
 
-	t_mutex	*m_forks;
-	t_mutex	*m_meals;
-	t_mutex	m_monitor;
-	t_mutex	m_state;
+	t_philo		*philos;
+
+	t_mutex		*m_forks;
+	t_mutex		*m_meals;
+	t_mutex		m_monitor;
+	t_mutex		m_state;
 
 	pthread_t	*threads;
 }	t_data;
@@ -99,8 +100,6 @@ bool	valid_input(int argc, char *argv[], t_data *data);
 
 // THREAD.C
 bool	create_threads(t_data *data);
-
-// MAIN.C
 
 // ROUTINE.C
 void	*routine(void *arg);
@@ -123,8 +122,16 @@ int64_t	mutex_get_int64(t_mutex *mutex, int64_t *value);
 void	error_msg(char *str);
 size_t	ft_strlen(char *str);
 bool	ft_usleep(t_philo *philo, int64_t time_to);
+bool	mutex_get_bool(t_mutex *mutex, bool *value);
 
 // MONITORING.C
 void	monitor_philos(t_data *data);
+
+// MUTEX.C
+bool	init_mutex(t_data *data);
+
+// MAIN.C
+void	cleanup(t_data *data);
+void	join_threads(t_data *data, int max);
 
 #endif
