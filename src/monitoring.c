@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   monitoring.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
+/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/17 03:35:06 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/17 16:42:57 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,11 +36,14 @@ void	monitor_philos(t_data *data)
 				{
 					data->philos[i].full = true;
 					full_philos++;
+					// printf("%ld ---------------------------------- %d	%ld	%ld\n", current_time() - data->start_time, i, meal_count, data->times_to_eat);
 					if (full_philos == data->philo_count)
 					{
 						pthread_mutex_unlock(data->philos[i].m_meal);
 						pthread_mutex_unlock(&data->m_state);
+						// printf("All philosophers are full\n");
 						return ;
+						// break ;
 					}
 				}
 				else if (last_meal >= data->time_to_die)
@@ -57,6 +60,6 @@ void	monitor_philos(t_data *data)
 			}
 			i++;
 		}
-		usleep(1);
+		usleep(50);
 	}
 }

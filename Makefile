@@ -3,19 +3,19 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+         #
+#    By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/28 00:51:40 by ichiro            #+#    #+#              #
-#    Updated: 2023/11/17 02:12:52 by imisumi-wsl      ###   ########.fr        #
+#    Updated: 2023/11/17 14:34:05 by imisumi          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = philo
 
-CFLAGS = -g -pthread
-# CFLAGS += -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -pthread
+# CFLAGS += -g
 
-cc = gcc
+cc = cc
 
 OBJS_DIR = .objs
 SRC_DIR = src
