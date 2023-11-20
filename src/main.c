@@ -6,13 +6,13 @@
 /*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/17 14:18:02 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/11/20 15:13:16 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philo.h"
 
-bool	allocate_philos(t_data *data)
+static bool	allocate_philos(t_data *data)
 {
 	data->philos = malloc(sizeof(t_philo) * data->philo_count);
 	if (data->philos == NULL)
@@ -23,7 +23,7 @@ bool	allocate_philos(t_data *data)
 	return (true);
 }
 
-bool	create_philos(t_data *data)
+static bool	create_philos(t_data *data)
 {
 	int		i;
 	int64_t	philo_count;
@@ -97,7 +97,8 @@ int	main(int argc, char *argv[])
 		return (EXIT_FAILURE);
 	if (create_threads(&data) == false)
 		return (EXIT_FAILURE);
-	while (mutex_get_int64(&data.m_monitor, &data.monitoring) != data.philo_count)
+	while (mutex_get_int64(&data.m_monitor, &data.monitoring) \
+			!= data.philo_count)
 		usleep(10);
 	monitor_philos(&data);
 	join_threads(&data, data.philo_count);

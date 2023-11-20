@@ -6,7 +6,7 @@
 /*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 21:15:55 by ichiro            #+#    #+#             */
-/*   Updated: 2023/11/17 14:17:47 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/11/20 15:18:46 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,34 +95,12 @@ typedef struct s_data
 	pthread_t	*threads;
 }	t_data;
 
+// MAIN.C
+void	cleanup(t_data *data);
+void	join_threads(t_data *data, int max);
+
 // INPUT.C
 bool	valid_input(int argc, char *argv[], t_data *data);
-
-// THREAD.C
-bool	create_threads(t_data *data);
-
-// ROUTINE.C
-void	*routine(void *arg);
-
-bool	print_state(t_philo *philo, t_action action);
-
-// PHILO_ACTIONS.C
-bool	philo_eat(t_philo	*philo);
-bool	philo_sleep(t_philo	*philo);
-bool	philo_think(t_philo	*philo);
-void	thinking(t_philo *philo);
-
-// PHILO_UTILS_ACTIONS.C
-bool	pickup_forks(t_philo	*philo);
-void	drop_forks(t_philo	*philo);
-
-// UTILS.C
-int64_t	current_time(void);
-int64_t	mutex_get_int64(t_mutex *mutex, int64_t *value);
-void	error_msg(char *str);
-size_t	ft_strlen(char *str);
-bool	ft_usleep(t_philo *philo, int64_t time_to);
-bool	mutex_get_bool(t_mutex *mutex, bool *value);
 
 // MONITORING.C
 void	monitor_philos(t_data *data);
@@ -130,8 +108,31 @@ void	monitor_philos(t_data *data);
 // MUTEX.C
 bool	init_mutex(t_data *data);
 
-// MAIN.C
-void	cleanup(t_data *data);
-void	join_threads(t_data *data, int max);
+// PHILO_UTILS_ACTIONS.C
+bool	pickup_forks(t_philo	*philo);
+void	drop_forks(t_philo	*philo);
+
+// PHILO_ACTIONS.C
+bool	philo_eat(t_philo	*philo);
+bool	philo_sleep(t_philo	*philo);
+bool	philo_think(t_philo	*philo);
+void	thinking(t_philo *philo);
+
+// ROUTINE.C
+bool	print_state(t_philo *philo, t_action action);
+void	*routine(void *arg);
+
+// THREAD.C
+bool	create_threads(t_data *data);
+
+// UTILS.C
+int64_t	current_time(void);
+void	error_msg(char *str);
+size_t	ft_strlen(char *str);
+bool	ft_usleep(t_philo *philo, int64_t time_to);
+
+// UTILS2.C
+int64_t	mutex_get_int64(t_mutex *mutex, int64_t *value);
+bool	mutex_get_bool(t_mutex *mutex, bool *value);
 
 #endif

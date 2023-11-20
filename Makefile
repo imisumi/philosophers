@@ -6,7 +6,7 @@
 #    By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/28 00:51:40 by ichiro            #+#    #+#              #
-#    Updated: 2023/11/17 14:34:05 by imisumi          ###   ########.fr        #
+#    Updated: 2023/11/20 15:18:23 by imisumi          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,7 +32,8 @@ SRCS =	main.c \
 		thread.c \
 		utils.c \
 		monitoring.c \
-		mutex.c
+		mutex.c \
+		utils2.c
 
 OBJS = $(addprefix $(OBJS_DIR)/,$(SRCS:.c=.o))
 

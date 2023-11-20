@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   routine.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
+/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 11:54:34 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/17 03:28:10 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/20 15:16:58 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ bool	print_state(t_philo *philo, t_action action)
 	return (true);
 }
 
-bool	desync_philos(t_philo	*philo)
+static bool	desync_philos(t_philo	*philo)
 {
 	if (philo->data->philo_count % 2 == 0)
 	{
@@ -56,7 +56,7 @@ bool	desync_philos(t_philo	*philo)
 	return (true);
 }
 
-void	*handle_single_philo(t_philo *philo)
+static void	*handle_single_philo(t_philo *philo)
 {
 	t_data	*data;
 
